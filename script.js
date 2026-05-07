@@ -26,10 +26,15 @@
       done();
       return;
     }
-    window.addEventListener("load", function () {
+    if (document.readyState === "complete") {
       setTimeout(done, 580);
-    });
-    setTimeout(done, 3400);
+    } else {
+      window.addEventListener("load", function () {
+        setTimeout(done, 580);
+      });
+      // Fallback if load event doesn't fire
+      setTimeout(done, 3000);
+    }
   }
 
   /* ——— Scroll progress ——— */
