@@ -446,73 +446,46 @@
   function initCheckout() {
     const checkoutModal = document.getElementById('checkout-modal');
     const comingSoonModal = document.getElementById('coming-soon-modal');
-    const checkoutOverlay = document.getElementById('checkout-overlay');
-    const comingSoonOverlay = document.getElementById('coming-soon-overlay');
+    const checkoutForm = document.getElementById('checkout-form');
     
     if (!checkoutModal || !comingSoonModal) return;
 
-    const planDetails = {
-      'Starter': {
-        title: 'Starter Plan',
-        price: '₹299',
-        features: [
-          'Basic access to digital services',
-          'Standard support (24/7)',
-          'Monthly billing with secure access',
-          'Email & Chat assistance'
-        ]
-      },
-      'Professional': {
-        title: 'Professional Plan',
-        price: '₹999',
-        features: [
-          'Advanced workflow automation tools',
-          'Priority support with dedicated agents',
-          'Enhanced service access limits',
-          'Custom API integration support',
-          'Team management features'
-        ]
-      },
-      'Full Package': {
-        title: 'Full Package',
-        price: '₹9999',
-        features: [
-          'Complete business-focused solutions',
-          'Dedicated 1-on-1 account manager',
-          'Unlimited service support & maintenance',
-          'Custom enterprise-grade infrastructure',
-          'White-label options included',
-          'Direct priority call support'
-        ]
-      }
+    const planPrices = {
+      'Starter': 299,
+      'Professional': 999,
+      'Full Package': 9999
     };
 
     const openCheckout = (planName) => {
-      const details = planDetails[planName];
-      if (!details) return;
-
-      document.getElementById('modal-plan-title').textContent = details.title;
-      document.getElementById('modal-plan-price').textContent = details.price;
+      const price = planPrices[planName] || 0;
       
-      const featuresList = document.getElementById('modal-features-list');
-      featuresList.innerHTML = details.features.map(f => `
-        <li class="flex gap-3">
-          <span class="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-indigo-500"></span>
-          ${f}
-        </li>
-      `).join('');
+      document.getElementById('summary-plan-name').textContent = planName + ' Plan';
+      document.getElementById('summary-plan-price').textContent = '₹' + price;
+      document.getElementById('summary-subtotal').textContent = '₹' + price;
+      document.getElementById('summary-total').textContent = '₹' + price;
+      
+      const checkoutBtn = document.getElementById('final-checkout-btn');
+      if (checkoutBtn) {
+        checkoutBtn.textContent = `Checkout • ₹${price}`;
+      }
 
       checkoutModal.classList.remove('hidden');
       checkoutModal.classList.add('flex');
+      document.body.style.overflow = 'hidden'; // Prevent scroll
     };
 
-    const closeModals = () => {
+    const closeCheckout = () => {
       checkoutModal.classList.add('hidden');
       checkoutModal.classList.remove('flex');
+      document.body.style.overflow = ''; // Restore scroll
+    };
+
+    const closeComingSoon = () => {
       comingSoonModal.classList.add('hidden');
       comingSoonModal.classList.remove('flex');
     };
 
+    // Open checkout on Buy Now click
     document.querySelectorAll('.checkout-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const plan = btn.getAttribute('data-plan');
@@ -520,18 +493,39 @@
       });
     });
 
-    document.getElementById('close-checkout')?.addEventListener('click', closeModals);
-    checkoutOverlay?.addEventListener('click', closeModals);
+    // Close buttons
+    document.getElementById('close-checkout')?.addEventListener('click', closeCheckout);
+    document.getElementById('close-coming-soon')?.addEventListener('click', closeComingSoon);
     
+    // Final Checkout Action
     document.getElementById('final-checkout-btn')?.addEventListener('click', () => {
-      checkoutModal.classList.add('hidden');
-      checkoutModal.classList.remove('flex');
-      comingSoonModal.classList.add('hidden');
+      // Validate form
+      let ok = true;
+      checkoutForm.querySelectorAll('[required]').forEach(inp => {
+        const wrap = inp.closest('.float-field');
+        if (!inp.value.trim()) {
+          ok = false;
+          wrap?.classList.add('is-invalid');
+        } else {
+          wrap?.classList.remove('is-invalid');
+        }
+      });
+
+      const email = checkoutForm.querySelector('[name="email"]');
+      if (email && email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+        ok = false;
+        email.closest('.float-field')?.classList.add('is-invalid');
+      }
+
+      if (!ok) return;
+
+      // Show coming soon
+      comingSoonModal.classList.remove('hidden');
       comingSoonModal.classList.add('flex');
     });
 
-    document.getElementById('close-coming-soon')?.addEventListener('click', closeModals);
-    comingSoonOverlay?.addEventListener('click', closeModals);
+    // Close on overlay click for coming soon
+    document.getElementById('coming-soon-overlay')?.addEventListener('click', closeComingSoon);
   }
 
   ready(function () {
