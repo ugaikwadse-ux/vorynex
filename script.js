@@ -442,6 +442,98 @@
     });
   }
 
+  /* ——— Checkout Flow ——— */
+  function initCheckout() {
+    const checkoutModal = document.getElementById('checkout-modal');
+    const comingSoonModal = document.getElementById('coming-soon-modal');
+    const checkoutOverlay = document.getElementById('checkout-overlay');
+    const comingSoonOverlay = document.getElementById('coming-soon-overlay');
+    
+    if (!checkoutModal || !comingSoonModal) return;
+
+    const planDetails = {
+      'Starter': {
+        title: 'Starter Plan',
+        price: '₹299',
+        features: [
+          'Basic access to digital services',
+          'Standard support (24/7)',
+          'Monthly billing with secure access',
+          'Email & Chat assistance'
+        ]
+      },
+      'Professional': {
+        title: 'Professional Plan',
+        price: '₹999',
+        features: [
+          'Advanced workflow automation tools',
+          'Priority support with dedicated agents',
+          'Enhanced service access limits',
+          'Custom API integration support',
+          'Team management features'
+        ]
+      },
+      'Full Package': {
+        title: 'Full Package',
+        price: '₹9999',
+        features: [
+          'Complete business-focused solutions',
+          'Dedicated 1-on-1 account manager',
+          'Unlimited service support & maintenance',
+          'Custom enterprise-grade infrastructure',
+          'White-label options included',
+          'Direct priority call support'
+        ]
+      }
+    };
+
+    const openCheckout = (planName) => {
+      const details = planDetails[planName];
+      if (!details) return;
+
+      document.getElementById('modal-plan-title').textContent = details.title;
+      document.getElementById('modal-plan-price').textContent = details.price;
+      
+      const featuresList = document.getElementById('modal-features-list');
+      featuresList.innerHTML = details.features.map(f => `
+        <li class="flex gap-3">
+          <span class="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-indigo-500"></span>
+          ${f}
+        </li>
+      `).join('');
+
+      checkoutModal.classList.remove('hidden');
+      checkoutModal.classList.add('flex');
+    };
+
+    const closeModals = () => {
+      checkoutModal.classList.add('hidden');
+      checkoutModal.classList.remove('flex');
+      comingSoonModal.classList.add('hidden');
+      comingSoonModal.classList.remove('flex');
+    };
+
+    document.querySelectorAll('.checkout-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const plan = btn.getAttribute('data-plan');
+        openCheckout(plan);
+      });
+    });
+
+    document.getElementById('close-checkout')?.addEventListener('click', closeModals);
+    checkoutOverlay?.addEventListener('click', closeModals);
+    
+    document.getElementById('final-checkout-btn')?.addEventListener('click', () => {
+      checkoutModal.classList.add('hidden');
+      checkoutModal.classList.remove('flex');
+      comingSoonModal.classList.add('hidden');
+      comingSoonModal.classList.add('flex');
+    });
+
+    document.getElementById('close-coming-soon')?.addEventListener('click', closeModals);
+    comingSoonOverlay?.addEventListener('click', closeModals);
+  }
+
   ready(function () {
     initLoader();
     initScrollProgress();
@@ -459,5 +551,6 @@
     initForm();
     initBackTop();
     initAnchors();
+    initCheckout();
   });
 })();

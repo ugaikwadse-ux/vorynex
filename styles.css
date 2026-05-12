@@ -805,6 +805,65 @@ body.is-pointer-fine .cursor-glow.is-active {
   }
 }
 
+/* ——— Checkout Modals ——— */
+#checkout-modal.flex,
+#coming-soon-modal.flex {
+  display: flex !important;
+}
+
+#checkout-modal .bg-vn-card\/40,
+#coming-soon-modal .bg-vn-card\/60 {
+  background: rgba(26, 35, 64, 0.45);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+}
+
+#checkout-modal .relative,
+#coming-soon-modal .relative {
+  transform: scale(0.9);
+  opacity: 0;
+  transition: transform 0.4s var(--ease-spring), opacity 0.3s ease;
+}
+
+#checkout-modal.flex .relative,
+#coming-soon-modal.flex .relative {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal-overlay {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+#checkout-modal.flex .modal-overlay,
+#coming-soon-modal.flex .modal-overlay {
+  opacity: 1;
+}
+
+#modal-features-list li {
+  animation: slideIn 0.4s ease forwards;
+  opacity: 0;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-10px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+#modal-features-list li:nth-child(1) { animation-delay: 0.1s; }
+#modal-features-list li:nth-child(2) { animation-delay: 0.15s; }
+#modal-features-list li:nth-child(3) { animation-delay: 0.2s; }
+#modal-features-list li:nth-child(4) { animation-delay: 0.25s; }
+#modal-features-list li:nth-child(5) { animation-delay: 0.3s; }
+#modal-features-list li:nth-child(6) { animation-delay: 0.35s; }
+
+/* Pricing adjustment */
+#pricing .checkout-btn {
+  transition: all 0.3s ease;
+}
+
+
 /* Service card expand */
 .service-card__more {
   max-height: 0;

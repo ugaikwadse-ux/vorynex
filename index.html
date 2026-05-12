@@ -81,6 +81,7 @@
         }
       }
     </script>
+    <!-- Payment Checkout System -->
   </head>
   <body class="bg-vn-deep text-zinc-100 antialiased">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -775,11 +776,13 @@
                   </li>
                 </ul>
                 <div class="mt-8">
-                  <a
-                    href="#contact"
-                    class="magnetic inline-flex w-full items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
+                  <button
+                    type="button"
+                    class="checkout-btn magnetic inline-flex w-full items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
+                    data-amount="299"
+                    data-plan="Starter"
                     data-magnetic="0.12"
-                    >Contact Sales</a
+                    >Buy Now</button
                   >
                 </div>
               </article>
@@ -808,11 +811,13 @@
                   </li>
                 </ul>
                 <div class="mt-8">
-                  <a
-                    href="#contact"
-                    class="magnetic btn-ripple shimmer-sweep relative inline-flex w-full items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/30"
+                  <button
+                    type="button"
+                    class="checkout-btn magnetic btn-ripple shimmer-sweep relative inline-flex w-full items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/30"
+                    data-amount="999"
+                    data-plan="Professional"
                     data-magnetic="0.16"
-                    >Contact Sales</a
+                    >Buy Now</button
                   >
                 </div>
               </article>
@@ -820,32 +825,34 @@
               <article class="reveal service-card glass relative overflow-hidden rounded-2xl p-7 lg:p-8">
                 <div class="card-gradient-line"></div>
                 <p class="eyebrow text-cyan-300/90">Enterprise</p>
-                <h3 class="h-card mt-3 text-white">Enterprise Plan</h3>
-                <p class="mt-3 text-sm leading-relaxed text-zinc-400">Business-focused solutions with dedicated assistance and scalable service support.</p>
+                <h3 class="h-card mt-3 text-white">Full Package</h3>
+                <p class="mt-3 text-sm leading-relaxed text-zinc-400">Complete business-focused solutions with dedicated assistance and scalable service support.</p>
                 <div class="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                  <p class="text-xs text-zinc-500">Pricing</p>
-                  <p class="mt-2 font-heading text-3xl font-bold text-white">Custom</p>
+                  <p class="text-xs text-zinc-500">One-time payment</p>
+                  <p class="mt-2 font-heading text-3xl font-bold text-white">₹9999</p>
                 </div>
                 <ul class="mt-6 space-y-3 text-sm text-zinc-400">
                   <li class="flex gap-3">
                     <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
-                    Business-focused solutions
+                    Complete business solutions
                   </li>
                   <li class="flex gap-3">
                     <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
-                    Dedicated assistance
+                    Dedicated account manager
                   </li>
                   <li class="flex gap-3">
                     <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
-                    Scalable service support
+                    Unlimited service support
                   </li>
                 </ul>
                 <div class="mt-8">
-                  <a
-                    href="#contact"
-                    class="magnetic inline-flex w-full items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
+                  <button
+                    type="button"
+                    class="checkout-btn magnetic inline-flex w-full items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
+                    data-plan="Full Package"
+                    data-amount="9999"
                     data-magnetic="0.12"
-                    >Contact Sales</a
+                    >Buy Now</button
                   >
                 </div>
               </article>
@@ -1053,6 +1060,64 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>
       </button>
+
+      <!-- Checkout Modal -->
+      <div id="checkout-modal" class="fixed inset-0 z-[100] hidden items-center justify-center px-4">
+        <div class="absolute inset-0 bg-vn-dark/80 backdrop-blur-md modal-overlay" id="checkout-overlay"></div>
+        <div class="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-vn-card/40 p-8 shadow-2xl backdrop-blur-2xl">
+          <div class="card-gradient-line"></div>
+          <button id="close-checkout" class="absolute right-6 top-6 text-zinc-500 transition hover:text-white">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+          
+          <div class="text-center">
+            <h2 id="modal-plan-title" class="h-card text-white">Starter Plan</h2>
+            <p class="mt-2 text-zinc-400">Review your plan details before checkout</p>
+          </div>
+
+          <div class="mt-8 space-y-4">
+            <div class="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <p class="text-xs uppercase tracking-widest text-zinc-500">Service Highlights</p>
+              <ul id="modal-features-list" class="mt-4 space-y-3 text-sm text-zinc-300">
+                <!-- Dynamically filled -->
+              </ul>
+            </div>
+            
+            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <div>
+                <p class="text-xs uppercase tracking-widest text-zinc-500">Total Price</p>
+                <p id="modal-plan-price" class="mt-1 text-2xl font-bold text-white">₹299</p>
+              </div>
+              <div class="text-right">
+                <span class="rounded-full bg-indigo-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-tighter text-indigo-400">Secure Payment</span>
+              </div>
+            </div>
+          </div>
+
+          <button id="final-checkout-btn" class="magnetic btn-ripple shimmer-sweep mt-8 relative inline-flex w-full items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-indigo-900/30">
+            Complete Purchase
+          </button>
+          
+          <p class="mt-4 text-center text-[10px] text-zinc-500">By clicking complete purchase, you agree to our terms and conditions.</p>
+        </div>
+      </div>
+
+      <!-- Coming Soon Modal -->
+      <div id="coming-soon-modal" class="fixed inset-0 z-[110] hidden items-center justify-center px-4">
+        <div class="absolute inset-0 bg-vn-dark/60 backdrop-blur-sm modal-overlay" id="coming-soon-overlay"></div>
+        <div class="relative w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-vn-card/60 p-8 text-center shadow-2xl backdrop-blur-3xl">
+          <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-400 mb-6">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="h-card text-white">Payment Coming Soon</h3>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Our online payment gateway is currently under maintenance. Please contact our support team to complete your purchase.
+          </p>
+          <button id="close-coming-soon" class="mt-8 w-full rounded-full border border-white/10 bg-white/5 py-3 text-sm font-medium text-white transition hover:bg-white/10">
+            Understood
+          </button>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="./script.js"></script>
