@@ -450,23 +450,47 @@
     
     if (!checkoutModal || !comingSoonModal) return;
 
-    const planPrices = {
-      'Starter': 299,
-      'Professional': 999,
-      'Full Package': 9999
+    const planData = {
+      'Web Starter': {
+        price: 2999,
+        desc: 'Essential digital presence',
+        features: ['Professional Website', '1 Custom Domain', '12 Months Hosting', '6 Months Support', 'Basic SEO']
+      },
+      'Business Growth': {
+        price: 9999,
+        desc: 'Advanced tools & mobile integration',
+        features: ['Premium Web + Android App', '2 Custom Domains', '24 Months Hosting', '12 Months Support', 'Play Store Publishing', 'Social Marketing']
+      },
+      'Enterprise Suite': {
+        price: 24999,
+        desc: 'Ultimate enterprise business suite',
+        features: ['Enterprise Web + Native App', '5 Custom Domains', '24 Months Hosting Included', '24 Months Dedicated Support', 'ASO & Full Marketing', 'AI Automation Tools']
+      }
     };
 
     const openCheckout = (planName) => {
-      const price = planPrices[planName] || 0;
+      const data = planData[planName] || planData['Web Starter'];
+      const price = data.price;
       
-      document.getElementById('summary-plan-name').textContent = planName + ' Plan';
-      document.getElementById('summary-plan-price').textContent = '₹' + price;
-      document.getElementById('summary-subtotal').textContent = '₹' + price;
-      document.getElementById('summary-total').textContent = '₹' + price;
+      document.getElementById('summary-plan-name').textContent = planName;
+      document.getElementById('summary-plan-desc').textContent = data.desc;
+      document.getElementById('summary-plan-price').textContent = '₹' + price.toLocaleString();
+      document.getElementById('summary-subtotal').textContent = '₹' + price.toLocaleString();
+      document.getElementById('summary-total').textContent = '₹' + price.toLocaleString();
+
+      const featureList = document.getElementById('summary-plan-features');
+      if (featureList) {
+        featureList.innerHTML = data.features.map(f => `
+          <li class="flex items-center gap-2">
+            <svg class="h-3 w-3 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            ${f}
+          </li>
+        `).join('');
+      }
       
       const checkoutBtn = document.getElementById('final-checkout-btn');
       if (checkoutBtn) {
-        checkoutBtn.textContent = `Checkout • ₹${price}`;
+        checkoutBtn.textContent = `Checkout • ₹${price.toLocaleString()}`;
       }
 
       checkoutModal.classList.remove('hidden');
