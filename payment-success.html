@@ -203,7 +203,10 @@
             // 2. Try to get ID from localStorage
             const orderId = midFromUrl || localStorage.getItem('vorynex_last_mid');
 
-            if (!orderId) {
+            if (orderId) {
+                // Keep it fresh in storage for verification
+                localStorage.setItem('vorynex_last_mid', orderId);
+            } else {
                 showView('view-failed');
                 return;
             }
