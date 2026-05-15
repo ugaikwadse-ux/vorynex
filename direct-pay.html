@@ -147,6 +147,7 @@
             const price = params.get('price'); // price in rupees
             const email = params.get('email');
             const phone = params.get('phone');
+            const merchantorderid = params.get('merchantorderid');
 
             if (!plan || !price) {
                 showError("Missing plan or price parameters.");
@@ -164,11 +165,10 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         amount: amountPaisa,
-                        metadata: {
-                            plan: plan,
-                            email: email,
-                            phone: phone
-                        }
+                        email: email || "",
+                        phoneno: phone || "",
+                        merchantorderid: merchantorderid || `VNX_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+                        plan: plan
                     })
                 });
 

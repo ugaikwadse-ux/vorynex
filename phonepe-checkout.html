@@ -319,11 +319,17 @@
                 toggleLoader(true, 'Initiating Secure Link');
                 btn.disabled = true;
 
+                const mOrderId = `VNX_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
                 const response = await fetch(`${API_BASE}/create`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: 100 // ₹1.00 in paise
+                        amount: 100, // ₹1.00 in paise
+                        email: "direct-checkout@vorynex.in",
+                        phoneno: "0000000000",
+                        merchantorderid: mOrderId,
+                        plan: "Enterprise Suite"
                     })
                 });
 

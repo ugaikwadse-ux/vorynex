@@ -578,12 +578,21 @@
         const planName = document.getElementById('summary-plan-name').textContent;
         const amountStr = document.getElementById('summary-total').textContent.replace(/[^\d]/g, '');
         const amountPaisa = parseInt(amountStr) * 100;
+        
+        // Generate a merchantOrderId if not provided
+        const mOrderId = `VNX_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
         // 1. Create Payment API
         const response = await fetch(`${API_BASE}/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: amountPaisa })
+          body: JSON.stringify({ 
+            amount: amountPaisa,
+            email: formData.email || "",
+            phoneno: formData.phone || "",
+            merchantorderid: mOrderId,
+            plan: planName
+          })
         });
 
         if (!response.ok) throw new Error('Failed to create payment session');
