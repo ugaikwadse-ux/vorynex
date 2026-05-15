@@ -183,6 +183,13 @@
                     localStorage.setItem('vorynex_last_plan', plan);
                     if (email) localStorage.setItem('vorynex_last_email', email);
                     if (phone) localStorage.setItem('vorynex_last_phone', phone);
+
+                    // Communicate with Android Bridge if available (for app tracking)
+                    if (window.Android && typeof window.Android.onPaymentInitiated === 'function') {
+                        window.Android.onPaymentInitiated(mid);
+                    } else {
+                        console.log('Order ID generated:', mid);
+                    }
                 }
 
                 if (data.redirectUrl) {
