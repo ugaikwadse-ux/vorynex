@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success | Vorynex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --accent: #06b6d4;
+            --bg: #0b0f1a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            text-align: center;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 64px 40px;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+            display: none;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card.active { display: block; }
+
+        .icon-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .success-icon { color: var(--success); border: 2px solid var(--success); }
+        .failed-icon { color: var(--error); border: 2px solid var(--error); }
+
+        .icon-box svg { width: 48px; height: 48px; position: relative; z-index: 2; }
+
+        .pulse {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.15;
+            animation: pulse-anim 2s infinite;
+        }
+
+        @keyframes pulse-anim {
+            0% { transform: scale(1); opacity: 0.15; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.02em; }
+        p { color: #a1a1aa; line-height: 1.6; margin-bottom: 48px; font-size: 1.05rem; }
+
+        .info-grid {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 48px;
+            border: 1px solid var(--glass-border);
+            text-align: left;
+        }
+
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem; }
+        .info-row:last-child { margin-bottom: 0; }
+        .label { color: #71717a; font-weight: 500; }
+        .val { color: #fff; font-weight: 600; font-family: monospace; }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 22px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn:hover { transform: translateY(-5px); box-shadow: 0 30px 60px -15px rgba(99, 102, 241, 0.6); }
+
+        /* Verification Loader */
+        #verify-view { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner {
+            width: 64px; height: 64px;
+            border: 4px solid rgba(255,255,255,0.05);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin-bottom: 32px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .verify-text { font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Loader View -->
+        <div id="view-verify" class="card active" style="display: flex; flex-direction: column; align-items: center;">
+            <div class="spinner"></div>
+            <p class="verify-text">Authenticating Transaction...</p>
+        </div>
+
+        <!-- Success View -->
+        <div id="view-success" class="card">
+            <div class="icon-box success-icon">
+                <div class="pulse"></div>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h1>Payment Successful!</h1>
+            <p>Your subscription is now active. You have full access to the Vorynex enterprise ecosystem.</p>
+            
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="label">Transaction ID</span>
+                    <span class="val" id="success-id">--</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Status</span>
+                    <span class="val" style="color: var(--success)">COMPLETED</span>
+                </div>
+            </div>
+
+            <button onclick="window.location.href='index.html'" class="btn">
+                <span>Go to Dashboard</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+
+        <!-- Failed View -->
+        <div id="view-failed" class="card">
+            <div class="icon-box failed-icon">
+                <div class="pulse"></div>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </div>
+            <h1>Verification Failed</h1>
+            <p>We couldn't confirm your payment status. If money was deducted, it will be refunded within 3-5 business days.</p>
+            
+            <button onclick="window.location.href='phonepe-checkout.html'" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); box-shadow: none;">
+                <span>Retry Payment</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/v1.0/phonePe/payment';
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            // 1. Try to get ID from URL
+            const midFromUrl = params.get('merchantorderid') || params.get('merchantOrderId') || 
+                               params.get('orderId') || params.get('transactionId');
+            
+            // 2. Try to get ID from localStorage
+            const orderId = midFromUrl || localStorage.getItem('vorynex_last_mid');
+
+            if (!orderId) {
+                showView('view-failed');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: orderId // Backend expects merchantOrderId value in 'orderId' key
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'SUCCESS') {
+                    document.getElementById('success-id').textContent = orderId;
+                    showView('view-success');
+                } else {
+                    showView('view-failed');
+                }
+            } catch (err) {
+                console.error('Verify Error:', err);
+                showView('view-failed');
+            }
+        });
+
+        function showView(viewId) {
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('active');
+                c.style.display = 'none';
+            });
+            const activeCard = document.getElementById(viewId);
+            activeCard.classList.add('active');
+            activeCard.style.display = (viewId === 'view-verify') ? 'flex' : 'block';
+        }
+    </script>
+</body>
+</html>

@@ -521,10 +521,34 @@
     document.getElementById('close-checkout')?.addEventListener('click', closeCheckout);
     document.getElementById('close-coming-soon')?.addEventListener('click', closeComingSoon);
     
-    // Final Checkout Action
-    document.getElementById('final-checkout-btn')?.addEventListener('click', () => {
+    // Final Checkout Action (PhonePe Integration)
+    const finalCheckoutBtn = document.getElementById('final-checkout-btn');
+    const paymentLoader = document.getElementById('payment-loader');
+    const successModal = document.getElementById('payment-success-modal');
+    const failedModal = document.getElementById('payment-failed-modal');
+    const retryBtn = document.getElementById('retry-payment-btn');
+
+    // AUTO-VERIFY ON PAGE LOAD (Handles redirect back from PhonePe)
+    const checkPaymentStatus = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('merchantorderid') || urlParams.get('merchantOrderId') || 
+                      urlParams.get('orderId') || urlParams.get('transactionId');
+      
+      if (orderId) {
+        // Clear URL params to avoid re-verification on refresh
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        paymentLoader.classList.remove('hidden');
+        paymentLoader.classList.add('flex');
+        await verifyOrder(orderId);
+      }
+    };
+
+    const handlePayment = async () => {
       // Validate form
       let ok = true;
+      let formData = {};
+      
       checkoutForm.querySelectorAll('[required]').forEach(inp => {
         const wrap = inp.closest('.float-field');
         if (!inp.value.trim()) {
@@ -532,6 +556,7 @@
           wrap?.classList.add('is-invalid');
         } else {
           wrap?.classList.remove('is-invalid');
+          formData[inp.name] = inp.value.trim();
         }
       });
 
@@ -543,10 +568,119 @@
 
       if (!ok) return;
 
-      // Show coming soon
-      comingSoonModal.classList.remove('hidden');
-      comingSoonModal.classList.add('flex');
+      // Prevent double click
+      finalCheckoutBtn.disabled = true;
+      paymentLoader.classList.remove('hidden');
+      paymentLoader.classList.add('flex');
+
+      try {
+        const planName = document.getElementById('summary-plan-name').textContent;
+        const amountStr = document.getElementById('summary-total').textContent.replace(/[^\d]/g, '');
+        const amountPaisa = parseInt(amountStr) * 100;
+
+        // 1. Create Payment API
+        const response = await fetch('http://localhost:8080/api/v1.0/phonePe/payment/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: amountPaisa })
+        });
+
+        if (!response.ok) throw new Error('Failed to create payment session');
+        const data = await response.json(); // { orderId, token, state }
+
+        if (!data.orderId && !data.merchantorderid) {
+            throw new Error('Invalid response from payment server: Missing Order ID');
+        }
+        
+        if (!data.redirectUrl && !data.token) {
+            throw new Error('Invalid response from payment server: Missing Redirect URL or Token');
+        }
+
+        // 2. Open PhonePe Checkout
+        console.log('Backend Response:', data);
+        
+        // Store merchantOrderId locally
+        const mid = data.merchantorderid || data.merchantOrderId;
+        if (mid) localStorage.setItem('vorynex_last_mid', mid);
+
+        if (data.redirectUrl) {
+            console.log('Redirecting to Payment Gateway:', data.redirectUrl);
+            window.location.href = data.redirectUrl;
+        } else if (window.PhonePeCheckout) {
+          try {
+            window.PhonePeCheckout.transact({
+              tokenUrl: data.token,
+              callback: (res) => {
+                console.log('PhonePe SDK Callback:', res);
+                if (res === 'CONCLUDED' || res === 'SUCCESS') {
+                  verifyOrder(data.orderId);
+                } else if (res === 'USER_CANCEL') {
+                  showFailed();
+                }
+              },
+              type: "REDIRECT"
+            });
+          } catch (e) {
+            console.warn('SDK Transact failed, falling back to manual redirect');
+            if (data.token && data.token.startsWith('http')) window.location.href = data.token;
+            else showFailed();
+          }
+        } else {
+          console.error('No redirectUrl found in response and SDK not available');
+          showFailed();
+        }
+
+      } catch (err) {
+        console.error('Checkout error:', err);
+        showFailed();
+      }
+    };
+
+    const verifyOrder = async (orderId) => {
+      try {
+        const response = await fetch(`${API_BASE}/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: orderId }) // Send merchantOrderId value as 'orderId' key
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'SUCCESS') {
+          showSuccess(orderId);
+        } else {
+          showFailed();
+        }
+      } catch (err) {
+        console.error('Verification error:', err);
+        showFailed();
+      }
+    };
+
+    const showSuccess = (orderId) => {
+      paymentLoader.classList.add('hidden');
+      paymentLoader.classList.remove('flex');
+      document.getElementById('success-txid').textContent = orderId;
+      successModal.classList.remove('hidden');
+      successModal.classList.add('flex');
+    };
+
+    const showFailed = () => {
+      paymentLoader.classList.add('hidden');
+      paymentLoader.classList.remove('flex');
+      finalCheckoutBtn.disabled = false;
+      failedModal.classList.remove('hidden');
+      failedModal.classList.add('flex');
+    };
+
+    finalCheckoutBtn?.addEventListener('click', handlePayment);
+    retryBtn?.addEventListener('click', () => {
+      failedModal.classList.add('hidden');
+      handlePayment();
     });
+
+    // Check status on load
+    checkPaymentStatus();
 
     // Close on overlay click for coming soon
     document.getElementById('coming-soon-overlay')?.addEventListener('click', closeComingSoon);

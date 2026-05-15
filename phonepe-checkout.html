@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Checkout | Vorynex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #06b6d4;
+            --bg: #0b0f1a;
+            --card: rgba(26, 35, 64, 0.4);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f4f4f5;
+            --text-dim: #a1a1aa;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .checkout-wrapper {
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+        }
+
+        .card {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 48px 40px;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.6);
+            display: none;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-text {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 5px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* Order Summary */
+        .summary-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-info .title {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .item-info .sub {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .item-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .btn-pay {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 15px 35px -10px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-pay:active {
+            transform: translateY(0);
+        }
+
+        /* Status UI */
+        .status-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .icon-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .icon-circle svg {
+            width: 32px;
+            height: 32px;
+            z-index: 2;
+        }
+
+        .success-circle { background: rgba(16, 185, 129, 0.1); border: 2px solid var(--success); color: var(--success); }
+        .error-circle { background: rgba(239, 68, 68, 0.1); border: 2px solid var(--error); color: var(--error); }
+
+        .pulse-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            opacity: 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        .status-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
+        .status-desc { color: var(--text-dim); line-height: 1.6; margin-bottom: 32px; }
+
+        /* Loader */
+        #payment-loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .spinner-ring {
+            width: 56px;
+            height: 56px;
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s infinite linear;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loader-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--primary-light);
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 40px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="checkout-wrapper">
+        <!-- Loader Overlay -->
+        <div id="payment-loader">
+            <div class="spinner-ring"></div>
+            <p class="loader-text" id="status-text">Processing Payment</p>
+        </div>
+
+        <!-- VIEW: INITIAL CHECKOUT -->
+        <div id="view-checkout" class="card active">
+            <div class="header">
+                <span class="logo-text">Vorynex Secure</span>
+                <h1>Finalize Purchase</h1>
+            </div>
+
+            <div class="summary-box">
+                <div class="item-info">
+                    <span class="title">Enterprise Suite</span>
+                    <span class="sub">1 Year Subscription</span>
+                </div>
+                <div class="item-price">₹499</div>
+            </div>
+
+            <button onclick="handleCheckout()" class="btn-pay" id="checkout-btn">
+                <span>Secure Checkout</span>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </button>
+        </div>
+
+        <!-- VIEW: SUCCESS -->
+        <div id="view-success" class="card">
+            <div class="status-header">
+                <div class="icon-circle success-circle">
+                    <div class="pulse-ring"></div>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 class="status-title">Payment Successful!</h2>
+                <p class="status-desc">Payment successful. Our team will contact you shortly.</p>
+            </div>
+            <button onclick="window.location.href='index.html'" class="btn-pay" style="background: rgba(255,255,255,0.05); box-shadow: none; border: 1px solid var(--border);">Return to Home</button>
+        </div>
+
+        <!-- VIEW: FAILED -->
+        <div id="view-failed" class="card">
+            <div class="status-header">
+                <div class="icon-circle error-circle">
+                    <div class="pulse-ring"></div>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </div>
+                <h2 class="status-title">Payment Failed</h2>
+                <p class="status-desc">We couldn't verify your transaction. Your account has not been charged. Please try again.</p>
+            </div>
+            <button onclick="location.reload()" class="btn-pay">Retry Payment</button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * PHONEPE INTEGRATION (v2 REST API)
+         * API_BASE: Centralized variable for domain migration
+         */
+        const API_BASE = 'https://api.vorynex.in/api/v1.0/phonePe/payment';
+        
+        const loader = document.getElementById('payment-loader');
+        const statusText = document.getElementById('status-text');
+
+        // On Load: Check if we are returning from a payment
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            // 1. Check URL params first
+            const midFromUrl = params.get('merchantorderid') || params.get('merchantOrderId') || 
+                               params.get('orderId') || params.get('transactionId');
+            
+            // 2. Fallback to localStorage if URL is clean
+            const orderId = midFromUrl || localStorage.getItem('vorynex_last_mid');
+            
+            if (orderId) {
+                verifyTransaction(orderId);
+            }
+        });
+
+        /**
+         * STEP 1: CREATE PAYMENT
+         * Calls backend to get PhonePe redirect URL
+         */
+        async function handleCheckout() {
+            const btn = document.getElementById('checkout-btn');
+            
+            try {
+                toggleLoader(true, 'Initiating Secure Link');
+                btn.disabled = true;
+
+                const response = await fetch(`${API_BASE}/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: 49900 // ₹499.00 in paise
+                    })
+                });
+
+                if (!response.ok) throw new Error('API Error');
+                
+                const data = await response.json();
+                
+                // Store merchantOrderId locally for verification tracking
+                const mid = data.merchantorderid || data.merchantOrderId;
+                if (mid) localStorage.setItem('vorynex_last_mid', mid);
+
+                if (data.redirectUrl) {
+                    // STEP 2: REDIRECT TO PHONEPE
+                    console.log('Redirecting to:', data.redirectUrl);
+                    window.location.href = data.redirectUrl;
+                } else {
+                    throw new Error('No redirect URL received');
+                }
+
+            } catch (err) {
+                console.error('Checkout failed:', err);
+                toggleLoader(false);
+                btn.disabled = false;
+                alert('Connection Error: Unable to reach payment gateway. Ensure backend is running.');
+            }
+        }
+
+        /**
+         * STEP 3: VERIFY PAYMENT
+         * Calls backend to check order status
+         */
+        async function verifyTransaction(orderId) {
+            try {
+                toggleLoader(true, 'Verifying Transaction');
+                
+                const response = await fetch(`${API_BASE}/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: orderId // Backend expects the merchantorderid value in the "orderId" key
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'SUCCESS') {
+                    showView('view-success');
+                } else {
+                    showView('view-failed');
+                }
+            } catch (err) {
+                console.error('Verification Error:', err);
+                showView('view-failed');
+            } finally {
+                toggleLoader(false);
+            }
+        }
+
+        // --- Helper Functions ---
+
+        function toggleLoader(show, text = 'Processing') {
+            loader.style.display = show ? 'flex' : 'none';
+            statusText.innerText = text;
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            
+            // Clean URL query params to prevent re-verification on refresh
+            if (viewId !== 'view-checkout') {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    </script>
+</body>
+</html>
