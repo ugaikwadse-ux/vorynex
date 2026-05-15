@@ -453,17 +453,17 @@
 
     const planData = {
       'Web Starter': {
-        price: 2999,
+        price: 1,
         desc: 'Essential digital presence',
         features: ['Professional Website', '1 Custom Domain', '12 Months Hosting', '6 Months Support', 'Basic SEO']
       },
       'Business Growth': {
-        price: 9999,
+        price: 1,
         desc: 'Advanced tools & mobile integration',
         features: ['Premium Web + Android App', '2 Custom Domains', '24 Months Hosting', '12 Months Support', 'Play Store Publishing', 'Social Marketing']
       },
       'Enterprise Suite': {
-        price: 24999,
+        price: 1,
         desc: 'Ultimate enterprise business suite',
         features: ['Enterprise Web + Native App', '5 Custom Domains', '24 Months Hosting Included', '24 Months Dedicated Support', 'ASO & Full Marketing', 'AI Automation Tools']
       }
