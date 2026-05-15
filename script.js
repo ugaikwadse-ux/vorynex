@@ -444,7 +444,7 @@
 
   /* ——— Checkout Flow ——— */
   function initCheckout() {
-    const API_BASE = 'https://api.vorynex.in/api/v1.0/phonePe/payment';
+    const API_BASE = 'https://pay.vorynex.in/api/v1.0/phonePe/payment';
     const checkoutModal = document.getElementById('checkout-modal');
     const comingSoonModal = document.getElementById('coming-soon-modal');
     const checkoutForm = document.getElementById('checkout-form');
