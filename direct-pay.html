@@ -168,17 +168,21 @@
                         amount: amountPaisa,
                         email: email || "",
                         phoneno: phone || "",
-                        merchantorderid: merchantorderid || `VNX_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+                        merchantorderid: merchantorderid,
                         plan: plan
                     })
                 });
 
-                if (!response.ok) throw new Error('Failed to initiate payment');
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('Backend Error:', errorData);
+                    throw new Error(`Server returned ${response.status}: ${errorData.message || 'Payment initiation failed'}`);
+                }
 
                 const data = await response.json();
                 
                 // Store metadata locally for verification tracking if needed
-                const mid = data.merchantorderid || data.merchantOrderId;
+                const mid = data.merchantorderid || data.merchantOrderId || merchantorderid;
                 if (mid) {
                     localStorage.setItem('vorynex_last_mid', mid);
                     localStorage.setItem('vorynex_last_plan', plan);
@@ -188,13 +192,10 @@
                     // Communicate with Android Bridge if available (for app tracking)
                     if (window.Android && typeof window.Android.onPaymentInitiated === 'function') {
                         window.Android.onPaymentInitiated(mid);
-                    } else {
-                        console.log('Order ID generated:', mid);
                     }
                 }
 
                 if (data.redirectUrl) {
-                    // Redirect to payment gateway
                     window.location.href = data.redirectUrl;
                 } else {
                     throw new Error('No redirect URL received from server');
@@ -202,7 +203,7 @@
 
             } catch (err) {
                 console.error('Direct pay error:', err);
-                showAccessDenied("Unable to connect to payment gateway. Please verify your link or try again later.");
+                showAccessDenied(`Connection Failed: ${err.message}`);
             }
         }
 
