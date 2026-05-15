@@ -81,7 +81,7 @@ public class PhonePeService {
         
         Map<String, String> merchantUrls = new HashMap<>();
         // Note: Replace this with your actual success page URL
-        merchantUrls.put("redirectUrl", "http://localhost:5500/phonepe-checkout.html"); 
+        merchantUrls.put("redirectUrl", "https://vorynex.in/phonepe-checkout.html"); 
         paymentFlow.put("merchantUrls", merchantUrls);
 
         Map<String, Object> body = new HashMap<>();

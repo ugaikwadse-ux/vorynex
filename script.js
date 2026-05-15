@@ -444,6 +444,7 @@
 
   /* ——— Checkout Flow ——— */
   function initCheckout() {
+    const API_BASE = 'https://api.vorynex.in/api/v1.0/phonePe/payment';
     const checkoutModal = document.getElementById('checkout-modal');
     const comingSoonModal = document.getElementById('coming-soon-modal');
     const checkoutForm = document.getElementById('checkout-form');
@@ -579,7 +580,7 @@
         const amountPaisa = parseInt(amountStr) * 100;
 
         // 1. Create Payment API
-        const response = await fetch('http://localhost:8080/api/v1.0/phonePe/payment/create', {
+        const response = await fetch(`${API_BASE}/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: amountPaisa })
