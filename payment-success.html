@@ -216,11 +216,12 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        orderId: orderId // Backend expects merchantOrderId value in 'orderId' key
+                        merchantorderid: orderId 
                     })
                 });
 
                 const result = await response.json();
+                console.log('Verification result:', result);
 
                 if (result.status === 'SUCCESS') {
                     document.getElementById('success-id').textContent = orderId;
@@ -231,6 +232,7 @@
                         window.location.href = "vorynex://payment-success";
                     }, 1000);
                 } else {
+                    console.error('Verification failed:', result);
                     showView('view-failed');
                 }
             } catch (err) {
