@@ -149,8 +149,9 @@
             const phone = params.get('phone');
             const merchantorderid = params.get('merchantorderid');
 
-            if (!plan || !price) {
-                showError("Missing plan or price parameters.");
+            // Strict validation
+            if (!plan || !price || !email || !phone || !merchantorderid) {
+                showAccessDenied("Missing required transaction parameters. Ensure plan, price, email, phone, and merchantorderid are provided.");
                 return;
             }
 
@@ -201,13 +202,17 @@
 
             } catch (err) {
                 console.error('Direct pay error:', err);
-                showError("Unable to connect to payment gateway. Please try again later.");
+                showAccessDenied("Unable to connect to payment gateway. Please verify your link or try again later.");
             }
         }
 
-        function showError(msg) {
+        function showAccessDenied(msg) {
             document.getElementById('loader').style.display = 'none';
-            document.getElementById('error-card').style.display = 'block';
+            const card = document.getElementById('error-card');
+            card.style.display = 'block';
+            card.style.background = 'rgba(239, 68, 68, 0.15)';
+            card.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            document.querySelector('.error-title').textContent = 'Access Denied';
             document.getElementById('error-msg').textContent = msg;
         }
 
