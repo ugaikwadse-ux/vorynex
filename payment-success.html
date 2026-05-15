@@ -222,6 +222,11 @@
                 if (result.status === 'SUCCESS') {
                     document.getElementById('success-id').textContent = orderId;
                     showView('view-success');
+                    
+                    // Signal Android app of success
+                    setTimeout(function() {
+                        window.location.href = "vorynex://payment-success";
+                    }, 1000);
                 } else {
                     showView('view-failed');
                 }
