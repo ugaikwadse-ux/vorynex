@@ -192,7 +192,7 @@
     </div>
 
     <script>
-        const API_BASE = 'https://pay.vorynex.in/api/v1.0/phonePe/payment';
+        const API_BASE = 'http://localhost:8080/api/v1.0/phonePe/payment';
 
         window.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
@@ -223,7 +223,7 @@
                     
                     // Signal Android app of success
                     setTimeout(function() {
-                        window.location.href = "vorynex://payment-success";
+                        window.location.href = "vorynex://payment-success.html";
                     }, 1000);
                 } else {
                     console.error('Verification failed:', result);
