@@ -196,17 +196,11 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
-            // 1. Try to get ID from URL
-            const midFromUrl = params.get('merchantorderid') || params.get('merchantOrderId') || 
-                               params.get('orderId') || params.get('transactionId');
-            
-            // 2. Try to get ID from localStorage
-            const orderId = midFromUrl || localStorage.getItem('vorynex_last_mid');
+            // Try to get ID from URL
+            const orderId = params.get('id') || params.get('merchantorderid') || params.get('merchantOrderId') || 
+                            params.get('orderId') || params.get('transactionId');
 
-            if (orderId) {
-                // Keep it fresh in storage for verification
-                localStorage.setItem('vorynex_last_mid', orderId);
-            } else {
+            if (!orderId) {
                 showView('view-failed');
                 return;
             }

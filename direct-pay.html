@@ -158,8 +158,11 @@
             document.getElementById('plan-display').textContent = `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan • ₹${price}`;
 
             try {
-                // Convert price to paise for API
-                const amountPaisa = Math.round(parseFloat(price) * 100);
+                // Convert price to paise for API (robust parsing)
+                const numericPrice = price.replace(/[^\d.]/g, '');
+                const amountPaisa = Math.round(parseFloat(numericPrice) * 100);
+
+                if (isNaN(amountPaisa)) throw new Error('Invalid price format');
 
                 const response = await fetch(`${API_BASE}/create`, {
                     method: 'POST',
