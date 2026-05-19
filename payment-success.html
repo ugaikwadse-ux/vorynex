@@ -170,7 +170,7 @@
                 </div>
             </div>
 
-            <button onclick="window.close()" class="btn">
+            <button onclick="closeWindow()" class="btn">
                 <span>Close Tab</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -185,7 +185,7 @@
             <h1>Payment Failed</h1>
             <p>Please close this tab and return to the app to retry your payment again.</p>
             
-            <button onclick="window.close()" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); box-shadow: none;">
+            <button onclick="closeWindow()" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); box-shadow: none;">
                 <span>Close Tab</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -227,7 +227,7 @@
                     
                     // Attempt to close the window
                     setTimeout(() => {
-                        window.close();
+                        closeWindow();
                     }, 500);
                 } else {
                     console.error('Verification failed:', result);
@@ -238,6 +238,37 @@
                 showView('view-failed');
             }
         });
+
+        function closeWindow() {
+            // Signal Android app first to handle custom tab closure/resume
+            const isSuccess = document.getElementById('view-success').classList.contains('active');
+            if (isSuccess) {
+                window.location.href = "vorynex://payment-success.html";
+            } else {
+                window.location.href = "vorynex://payment-failed.html";
+            }
+
+            // Attempt standard close
+            window.close();
+
+            // Bypass security restrictions in modern standard browsers (self-open hack)
+            setTimeout(() => {
+                try {
+                    window.open('', '_self');
+                    window.close();
+                } catch (e) {
+                    console.log('Close attempt 1 failed:', e);
+                }
+            }, 100);
+
+            setTimeout(() => {
+                try {
+                    window.open('about:blank', '_self').close();
+                } catch (e) {
+                    console.log('Close attempt 2 failed:', e);
+                }
+            }, 200);
+        }
 
         function showView(viewId) {
             document.querySelectorAll('.card').forEach(c => {
