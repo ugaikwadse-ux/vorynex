@@ -157,7 +157,7 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h1>Payment Successful!</h1>
-            <p>Your subscription is now active. You have full access to the Vorynex enterprise ecosystem.</p>
+            <p>Please close this tab and return to the app. Your subscription will be activated on closing this tab.</p>
             
             <div class="info-grid">
                 <div class="info-row">
@@ -170,11 +170,10 @@
                 </div>
             </div>
 
-            <button onclick="window.location.href='index.html'" class="btn">
-                <span>Go to Dashboard</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <button onclick="window.close()" class="btn">
+                <span>Close Tab</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-            <p id="countdown-text" style="margin-top: 24px; margin-bottom: 0; font-size: 0.9rem; color: var(--accent); font-weight: 600; letter-spacing: 0.5px;"></p>
         </div>
 
         <!-- Failed View -->
@@ -183,11 +182,12 @@
                 <div class="pulse"></div>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
             </div>
-            <h1>Verification Failed</h1>
-            <p>We couldn't confirm your payment status. If money was deducted, it will be refunded within 3-5 business days.</p>
+            <h1>Payment Failed</h1>
+            <p>Please close this tab and return to the app to retry your payment again.</p>
             
-            <button onclick="window.location.href='phonepe-checkout.html'" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); box-shadow: none;">
-                <span>Retry Payment</span>
+            <button onclick="window.close()" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); box-shadow: none;">
+                <span>Close Tab</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
     </div>
@@ -222,25 +222,13 @@
                     document.getElementById('success-id').textContent = orderId;
                     showView('view-success');
                     
-                    // Start countdown to close/redirect
-                    let timeLeft = 3;
-                    const countdownEl = document.getElementById('countdown-text');
-                    countdownEl.textContent = `Closing tab in ${timeLeft} seconds...`;
+                    // Signal Android app of success
+                    window.location.href = "vorynex://payment-success.html";
                     
-                    const interval = setInterval(() => {
-                        timeLeft--;
-                        if (timeLeft <= 0) {
-                            clearInterval(interval);
-                            // Signal Android app of success
-                            window.location.href = "vorynex://payment-success.html";
-                            // Attempt to close the window
-                            setTimeout(() => {
-                                window.close();
-                            }, 500);
-                        } else {
-                            countdownEl.textContent = `Closing tab in ${timeLeft} seconds...`;
-                        }
-                    }, 1000);
+                    // Attempt to close the window
+                    setTimeout(() => {
+                        window.close();
+                    }, 500);
                 } else {
                     console.error('Verification failed:', result);
                     showView('view-failed');
